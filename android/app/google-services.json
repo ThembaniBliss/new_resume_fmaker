@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869040424342",
+    "project_id": "resumefunctionality",
+    "storage_bucket": "resumefunctionality.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869040424342:android:e590124bf2fcd30a0649b7",
+        "android_client_info": {
+          "package_name": "com.Thembani.resumefunctionality"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUVwnBy2jWvMu_GB_gL2LNmEJKTKQJxUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
