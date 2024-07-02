@@ -15,6 +15,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String password = '';
 
   void loginUser() async {
+    print('Email: $email');
+    print('Password: $password');
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -22,9 +24,19 @@ class _LoginScreenState extends State<LoginScreen> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       }
+    } on FirebaseAuthException catch (e) {
+      print('Login failed: ${e.message}');
+      // Display error message
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: ${e.message}')),
+      );
     } catch (e) {
-      print(e);
-      // Handle error
+      print('An unexpected error occurred: $e');
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred.')),
+      );
     }
   }
 
