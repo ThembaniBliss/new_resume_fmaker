@@ -30,10 +30,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginScreen(),
+        '/': (context) => const LoginScreen(),
         '/home': (context) => HomeScreen(),
-        '/createCv': (context) => CreateCvScreen(),
-        '/updateCv': (context) => UpdateCvScreen(),
+        '/createCv': (context) => const CreateCvScreen(),
+        '/updateCv': (context) => const UpdateCvScreen(),
       },
     );
   }

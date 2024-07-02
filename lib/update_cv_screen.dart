@@ -3,7 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UpdateCvScreen extends StatefulWidget {
+  const UpdateCvScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _UpdateCvScreenState createState() => _UpdateCvScreenState();
 }
 
@@ -68,17 +71,17 @@ class _UpdateCvScreenState extends State<UpdateCvScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update CV'),
+        title: const Text('Update CV'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               onChanged: (value) {
                 name = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your name',
               ),
               controller: TextEditingController(text: name),
@@ -87,7 +90,7 @@ class _UpdateCvScreenState extends State<UpdateCvScreen> {
               onChanged: (value) {
                 email = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your email',
               ),
               controller: TextEditingController(text: email),
@@ -96,7 +99,7 @@ class _UpdateCvScreenState extends State<UpdateCvScreen> {
               onChanged: (value) {
                 phone = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your phone number',
               ),
               controller: TextEditingController(text: phone),
@@ -105,7 +108,7 @@ class _UpdateCvScreenState extends State<UpdateCvScreen> {
               onChanged: (value) {
                 education = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your education',
               ),
               controller: TextEditingController(text: education),
@@ -114,15 +117,15 @@ class _UpdateCvScreenState extends State<UpdateCvScreen> {
               onChanged: (value) {
                 experience = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your experience',
               ),
               controller: TextEditingController(text: experience),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: updateCv,
-              child: Text('Update CV'),
+              child: const Text('Update CV'),
             ),
           ],
         ),

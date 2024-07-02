@@ -1,5 +1,3 @@
-// build.gradle (App level)
-
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
@@ -60,9 +58,4 @@ dependencies {
 
 flutter {
     source = '../..'
-}
-
-repositories {
-    google()
-    mavenCentral()
 }

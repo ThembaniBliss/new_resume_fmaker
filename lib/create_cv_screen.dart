@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class CreateCvScreen extends StatefulWidget {
+  const CreateCvScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _CreateCvScreenState createState() => _CreateCvScreenState();
 }
 
@@ -50,17 +53,17 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create CV'),
+        title: const Text('Create CV'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               onChanged: (value) {
                 name = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your name',
               ),
             ),
@@ -68,7 +71,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
               onChanged: (value) {
                 email = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your email',
               ),
             ),
@@ -76,7 +79,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
               onChanged: (value) {
                 phone = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your phone number',
               ),
             ),
@@ -84,7 +87,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
               onChanged: (value) {
                 education = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your education',
               ),
             ),
@@ -92,14 +95,14 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
               onChanged: (value) {
                 experience = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your experience',
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: saveCv,
-              child: Text('Save CV'),
+              child: const Text('Save CV'),
             ),
           ],
         ),

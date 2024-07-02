@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       if (userCredential.user != null) {
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
