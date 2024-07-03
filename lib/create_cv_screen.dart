@@ -34,6 +34,9 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   }
 
   void saveCv() async {
+    print('Saving CV for user: ${loggedInUser?.uid}');
+    print(
+        'Name: $name, Email: $email, Phone: $phone, Education: $education, Experience: $experience');
     try {
       await _firestore.collection('cvs').doc(loggedInUser?.uid).set({
         'name': name,
@@ -43,9 +46,17 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
         'experience': experience,
       });
       // Notify user of success
+      print('CV saved successfully.');
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CV saved successfully.')),
+      );
     } catch (e) {
-      print(e);
-      // Handle error
+      print('Failed to save CV: $e');
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save CV: $e')),
+      );
     }
   }
 
