@@ -58,8 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               decoration: const InputDecoration(
                 hintText: 'Enter your email',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple),
+                ),
+                prefixIcon: Icon(Icons.email),
               ),
             ),
+            const SizedBox(height: 10.0),
             TextField(
               obscureText: true,
               onChanged: (value) {
@@ -67,6 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               decoration: const InputDecoration(
                 hintText: 'Enter your password',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple),
+                ),
+                prefixIcon: Icon(Icons.lock),
               ),
             ),
             const SizedBox(height: 20.0),
@@ -74,7 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: loginUser,
               child: const Text('Login'),
             ),
-            TextButton(
+            const SizedBox(height: 10.0), // Add some space between the buttons
+            ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,

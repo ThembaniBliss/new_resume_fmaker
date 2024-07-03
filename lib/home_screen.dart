@@ -14,6 +14,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Custom Button Style
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+      backgroundColor: Colors.deepPurple, // Background color
+      foregroundColor: Colors.white, // Text color
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      textStyle: const TextStyle(fontSize: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -29,12 +40,15 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              style: buttonStyle,
               onPressed: () {
                 Navigator.pushNamed(context, '/createCv');
               },
               child: const Text('Create CV'),
             ),
+            const SizedBox(height: 20), // Add space between buttons
             ElevatedButton(
+              style: buttonStyle,
               onPressed: () {
                 Navigator.pushNamed(context, '/updateCv');
               },
