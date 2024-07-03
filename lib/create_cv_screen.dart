@@ -19,6 +19,9 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   String phone = '';
   String education = '';
   String experience = '';
+  String skills = '';
+  String achievements = '';
+  String certifications = '';
 
   @override
   void initState() {
@@ -34,9 +37,6 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   }
 
   void saveCv() async {
-    print('Saving CV for user: ${loggedInUser?.uid}');
-    print(
-        'Name: $name, Email: $email, Phone: $phone, Education: $education, Experience: $experience');
     try {
       await _firestore.collection('cvs').doc(loggedInUser?.uid).set({
         'name': name,
@@ -44,15 +44,15 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
         'phone': phone,
         'education': education,
         'experience': experience,
+        'skills': skills,
+        'achievements': achievements,
+        'certifications': certifications,
       });
-      // Notify user of success
-      print('CV saved successfully.');
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('CV saved successfully.')),
       );
     } catch (e) {
-      print('Failed to save CV: $e');
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save CV: $e')),
@@ -68,7 +68,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: [
             TextField(
               onChanged: (value) {
@@ -94,20 +94,86 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
                 hintText: 'Enter your phone number',
               ),
             ),
+            TypeAheadFormField(
+              textFieldConfiguration: TextFieldConfiguration(
+                onChanged: (value) {
+                  education = value;
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Enter your education',
+                ),
+              ),
+              suggestionsCallback: (pattern) {
+                return [
+                  'Bachelor of Science',
+                  'Master of Science',
+                  'PhD',
+                  'High School Diploma'
+                ].where((suggestion) =>
+                    suggestion.toLowerCase().contains(pattern.toLowerCase()));
+              },
+              itemBuilder: (context, suggestion) {
+                return ListTile(
+                  title: Text(suggestion.toString()),
+                );
+              },
+              onSuggestionSelected: (suggestion) {
+                setState(() {
+                  education = suggestion.toString();
+                });
+              },
+            ),
+            TypeAheadFormField(
+              textFieldConfiguration: TextFieldConfiguration(
+                onChanged: (value) {
+                  experience = value;
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Enter your experience',
+                ),
+              ),
+              suggestionsCallback: (pattern) {
+                return [
+                  'Software Engineer',
+                  'Project Manager',
+                  'Data Analyst',
+                  'Marketing Specialist'
+                ].where((suggestion) =>
+                    suggestion.toLowerCase().contains(pattern.toLowerCase()));
+              },
+              itemBuilder: (context, suggestion) {
+                return ListTile(
+                  title: Text(suggestion.toString()),
+                );
+              },
+              onSuggestionSelected: (suggestion) {
+                setState(() {
+                  experience = suggestion.toString();
+                });
+              },
+            ),
             TextField(
               onChanged: (value) {
-                education = value;
+                skills = value;
               },
               decoration: const InputDecoration(
-                hintText: 'Enter your education',
+                hintText: 'Enter your skills',
               ),
             ),
             TextField(
               onChanged: (value) {
-                experience = value;
+                achievements = value;
               },
               decoration: const InputDecoration(
-                hintText: 'Enter your experience',
+                hintText: 'Enter your achievements',
+              ),
+            ),
+            TextField(
+              onChanged: (value) {
+                certifications = value;
+              },
+              decoration: const InputDecoration(
+                hintText: 'Enter your certifications',
               ),
             ),
             const SizedBox(height: 20.0),
