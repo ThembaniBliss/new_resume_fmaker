@@ -6,9 +6,10 @@ class HomeScreen extends StatelessWidget {
 
   HomeScreen({super.key});
 
-  void logout() async {
+  void logout(BuildContext context) async {
     await _auth.signOut();
-    // Redirect to login screen
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -19,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: logout,
+            onPressed: () => logout(context),
           ),
         ],
       ),

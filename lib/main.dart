@@ -5,6 +5,7 @@ import 'create_cv_screen.dart';
 import 'firebase_options.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'resetpasswordscreen.dart';
 import 'update_cv_screen.dart';
 
 void main() async {
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomeScreen(),
         '/createCv': (context) => const CreateCvScreen(),
         '/updateCv': (context) => const UpdateCvScreen(),
+        '/reset-password': (context) => const ResetPasswordScreen(),
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:new_resume_fmaker/resetpasswordscreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -72,6 +73,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton(
               onPressed: loginUser,
               child: const Text('Login'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ResetPasswordScreen()),
+                );
+              },
+              child: const Text('Forgot Password?'),
             ),
           ],
         ),
