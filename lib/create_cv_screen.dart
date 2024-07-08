@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+//import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class CreateCvScreen extends StatefulWidget {
-  const CreateCvScreen({super.key});
+  // ignore: use_super_parameters
+  const CreateCvScreen({Key? key}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -11,17 +15,19 @@ class CreateCvScreen extends StatefulWidget {
 }
 
 class _CreateCvScreenState extends State<CreateCvScreen> {
-  final _firestore = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _educationController = TextEditingController();
+  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _skillsController = TextEditingController();
+  final TextEditingController _achievementsController = TextEditingController();
+  final TextEditingController _certificationsController =
+      TextEditingController();
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   User? loggedInUser;
-  String name = '';
-  String email = '';
-  String phone = '';
-  String education = '';
-  String experience = '';
-  String skills = '';
-  String achievements = '';
-  String certifications = '';
 
   @override
   void initState() {
@@ -30,160 +36,95 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   }
 
   void getCurrentUser() {
-    final user = _auth.currentUser;
+    final User? user = _auth.currentUser;
     if (user != null) {
-      loggedInUser = user;
+      setState(() {
+        loggedInUser = user;
+      });
     }
   }
 
-  void saveCv() async {
-    try {
-      await _firestore.collection('cvs').doc(loggedInUser?.uid).set({
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'education': education,
-        'experience': experience,
-        'skills': skills,
-        'achievements': achievements,
-        'certifications': certifications,
-      });
-      // ignore: use_build_context_synchronously
+  void saveCv() {
+    final Map<String, String> cvData = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phone': _phoneController.text,
+      'education': _educationController.text,
+      'experience': _experienceController.text,
+      'skills': _skillsController.text,
+      'achievements': _achievementsController.text,
+      'certifications': _certificationsController.text,
+    };
+
+    _firestore.collection('cvs').doc(loggedInUser?.uid).set(cvData).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('CV saved successfully.')),
       );
-    } catch (e) {
-      // ignore: use_build_context_synchronously
+    }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save CV: $e')),
+        SnackBar(content: Text('Failed to save CV: $error')),
       );
-    }
+    });
+  }
+
+  Future<void> generateAndSharePdf() async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('CV for ${_nameController.text}',
+                style: const pw.TextStyle(fontSize: 24)),
+            pw.Text('Email: ${_emailController.text}'),
+            pw.Text('Phone: ${_phoneController.text}'),
+            pw.Text('Education: ${_educationController.text}'),
+            pw.Text('Experience: ${_experienceController.text}'),
+            pw.Text('Skills: ${_skillsController.text}'),
+            pw.Text('Achievements: ${_achievementsController.text}'),
+            pw.Text('Certifications: ${_certificationsController.text}'),
+          ],
+        ),
+      ),
+    );
+
+    await Printing.sharePdf(
+        bytes: await pdf.save(), filename: '${_nameController.text} CV.pdf');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create CV'),
-      ),
-      body: Padding(
+      appBar: AppBar(title: const Text('Create CV')),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
-            TextField(
-              onChanged: (value) {
-                name = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your name',
-              ),
-            ),
-            TextField(
-              onChanged: (value) {
-                email = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your email',
-              ),
-            ),
-            TextField(
-              onChanged: (value) {
-                phone = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your phone number',
-              ),
-            ),
-            TypeAheadFormField(
-              textFieldConfiguration: TextFieldConfiguration(
-                onChanged: (value) {
-                  education = value;
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Enter your education',
-                ),
-              ),
-              suggestionsCallback: (pattern) {
-                return [
-                  'Bachelor of Science',
-                  'Master of Science',
-                  'PhD',
-                  'High School Diploma'
-                ].where((suggestion) =>
-                    suggestion.toLowerCase().contains(pattern.toLowerCase()));
-              },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  title: Text(suggestion.toString()),
-                );
-              },
-              onSuggestionSelected: (suggestion) {
-                setState(() {
-                  education = suggestion.toString();
-                });
-              },
-            ),
-            TypeAheadFormField(
-              textFieldConfiguration: TextFieldConfiguration(
-                onChanged: (value) {
-                  experience = value;
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Enter your experience',
-                ),
-              ),
-              suggestionsCallback: (pattern) {
-                return [
-                  'Software Engineer',
-                  'Project Manager',
-                  'Data Analyst',
-                  'Marketing Specialist'
-                ].where((suggestion) =>
-                    suggestion.toLowerCase().contains(pattern.toLowerCase()));
-              },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  title: Text(suggestion.toString()),
-                );
-              },
-              onSuggestionSelected: (suggestion) {
-                setState(() {
-                  experience = suggestion.toString();
-                });
-              },
-            ),
-            TextField(
-              onChanged: (value) {
-                skills = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your skills',
-              ),
-            ),
-            TextField(
-              onChanged: (value) {
-                achievements = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your achievements',
-              ),
-            ),
-            TextField(
-              onChanged: (value) {
-                certifications = value;
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter your certifications',
-              ),
-            ),
+            buildTextField(_nameController, 'Enter your name'),
+            buildTextField(_emailController, 'Enter your email'),
+            buildTextField(_phoneController, 'Enter your phone number'),
+            buildTextField(_educationController, 'Enter your education'),
+            buildTextField(_experienceController, 'Enter your experience'),
+            buildTextField(_skillsController, 'Enter your skills'),
+            buildTextField(_achievementsController, 'Enter your achievements'),
+            buildTextField(
+                _certificationsController, 'Enter your certifications'),
+            const SizedBox(height: 20.0),
+            ElevatedButton(onPressed: saveCv, child: const Text('Save CV')),
             const SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: saveCv,
-              child: const Text('Save CV'),
-            ),
+                onPressed: generateAndSharePdf,
+                child: const Text('Generate and Share PDF')),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildTextField(TextEditingController controller, String hintText) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(hintText: hintText),
     );
   }
 }
