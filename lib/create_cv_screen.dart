@@ -1,14 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:printing/printing.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class CreateCvScreen extends StatefulWidget {
   // ignore: use_super_parameters
@@ -21,138 +16,130 @@ class CreateCvScreen extends StatefulWidget {
 class _CreateCvScreenState extends State<CreateCvScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _summaryController = TextEditingController();
   final TextEditingController _educationController = TextEditingController();
   final TextEditingController _experienceController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
-  final TextEditingController _achievementsController = TextEditingController();
   final TextEditingController _certificationsController =
       TextEditingController();
+  final TextEditingController _languagesController = TextEditingController();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? loggedInUser;
-
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
-  }
-
-  void getCurrentUser() {
-    final User? user = _auth.currentUser;
-    if (user != null) {
-      setState(() {
-        loggedInUser = user;
-      });
-    }
-  }
-
-  void saveCv() async {
-    final Map<String, String> cvData = {
-      'name': _nameController.text,
-      'email': _emailController.text,
-      'phone': _phoneController.text,
-      'education': _educationController.text,
-      'experience': _experienceController.text,
-      'skills': _skillsController.text,
-      'achievements': _achievementsController.text,
-      'certifications': _certificationsController.text,
-    };
-
-    await _firestore.collection('cvs').doc(loggedInUser?.uid).set(cvData);
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CV saved successfully.')),
+  Widget buildTextField(
+      String label, IconData icon, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        minLines: 1,
+        maxLines: 5, // allows for multi-line input for larger sections
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+      ),
     );
-
-    // Navigate to a new page after saving
-    // ignore: use_build_context_synchronously
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const SuccessPage()));
   }
 
-  Future<void> generateAndSharePdf() async {
+  Widget buildButton(String text, VoidCallback onPressed) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 10),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        // ignore: sort_child_properties_last
+        child: Text(text),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+      ),
+    );
+  }
+
+  Future<void> generatePdf() async {
     final pdf = pw.Document();
+
     pdf.addPage(
       pw.Page(
-        build: (pw.Context context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('CV for ${_nameController.text}',
-                style: const pw.TextStyle(fontSize: 24)),
-            pw.Text('Email: ${_emailController.text}'),
-            pw.Text('Phone: ${_phoneController.text}'),
-            pw.Text('Education: ${_educationController.text}'),
-            pw.Text('Experience: ${_experienceController.text}'),
-            pw.Text('Skills: ${_skillsController.text}'),
-            pw.Text('Achievements: ${_achievementsController.text}'),
-            pw.Text('Certifications: ${_certificationsController.text}'),
-          ],
-        ),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(_nameController.text,
+                  style: const pw.TextStyle(fontSize: 24)),
+              pw.SizedBox(height: 8),
+              pw.Text(_emailController.text,
+                  style: const pw.TextStyle(fontSize: 16)),
+              pw.SizedBox(height: 16),
+              pw.Text('Professional Summary:',
+                  style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_summaryController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+              pw.SizedBox(height: 16),
+              pw.Text('Education Details:',
+                  style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_educationController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+              pw.SizedBox(height: 16),
+              pw.Text('Professional Experience:',
+                  style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_experienceController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+              pw.SizedBox(height: 16),
+              pw.Text('Core Skills:', style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_skillsController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+              pw.SizedBox(height: 16),
+              pw.Text('Certifications:',
+                  style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_certificationsController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+              pw.SizedBox(height: 16),
+              pw.Text('Languages:', style: const pw.TextStyle(fontSize: 18)),
+              pw.Text(_languagesController.text,
+                  style: const pw.TextStyle(fontSize: 14)),
+            ],
+          );
+        },
       ),
     );
 
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/${_nameController.text} CV.pdf');
-    await file.writeAsBytes(await pdf.save());
-
-    final Email email = Email(
-      body: 'Here is my CV.',
-      subject: 'My CV',
-      recipients: [_emailController.text],
-      attachmentPaths: [file.path],
-      isHTML: false,
-    );
-
-    await FlutterEmailSender.send(email);
+    await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create CV')),
+      appBar: AppBar(
+        title: const Text('Create CV'),
+        backgroundColor: Colors.deepPurple,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildTextField(_nameController, 'Enter your name'),
-            buildTextField(_emailController, 'Enter your email'),
-            buildTextField(_phoneController, 'Enter your phone number'),
-            buildTextField(_educationController, 'Enter your education'),
-            buildTextField(_experienceController, 'Enter your experience'),
-            buildTextField(_skillsController, 'Enter your skills'),
-            buildTextField(_achievementsController, 'Enter your achievements'),
+            buildTextField('Name', Icons.person, _nameController),
+            buildTextField('Email', Icons.email, _emailController),
             buildTextField(
-                _certificationsController, 'Enter your certifications'),
-            const SizedBox(height: 20.0),
-            ElevatedButton(onPressed: saveCv, child: const Text('Save CV')),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-                onPressed: generateAndSharePdf,
-                child: const Text('Generate and Share PDF')),
+                'Professional Summary', Icons.article, _summaryController),
+            buildTextField(
+                'Education Details', Icons.school, _educationController),
+            buildTextField(
+                'Professional Experience', Icons.work, _experienceController),
+            buildTextField('Core Skills', Icons.build, _skillsController),
+            buildTextField('Certifications', Icons.card_membership,
+                _certificationsController),
+            buildTextField('Languages', Icons.language, _languagesController),
+            buildButton('Generate CV PDF', generatePdf),
           ],
         ),
       ),
-    );
-  }
-
-  Widget buildTextField(TextEditingController controller, String hintText) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(hintText: hintText),
-    );
-  }
-}
-
-class SuccessPage extends StatelessWidget {
-  const SuccessPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Success')),
-      body: const Center(child: Text('You have successfully created your CV!')),
     );
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:new_resume_fmaker/resetpasswordscreen.dart';
@@ -6,35 +8,37 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _auth = FirebaseAuth.instance;
-  String email = '';
-  String password = '';
+  final FirebaseAuth _auth = FirebaseAuth
+      .instance; // Ensure FirebaseAuth is correctly initialized in your project
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   void loginUser() async {
-    print('Email: $email');
-    print('Password: $password');
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password')),
+      );
+      return; // Prevents login attempt without credentials
+    }
+
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim());
       if (userCredential.user != null) {
-        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
-      print('Login failed: ${e.message}');
-      // Display error message
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: ${e.message}')),
+        SnackBar(
+            content: Text(
+                'Login failed: ${e.message}')), // Provide clear error messages
       );
     } catch (e) {
-      print('An unexpected error occurred: $e');
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred.')),
       );
@@ -46,55 +50,87 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
+            const SizedBox(height: 40),
+            const Text(
+              'Welcome Back!',
+              style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple),
+            ),
+            const SizedBox(height: 40),
+            TextFormField(
+              controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              onChanged: (value) {
-                email = value;
-              },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                labelText: 'Email',
                 hintText: 'Enter your email',
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
+                  borderSide:
+                      const BorderSide(color: Colors.deepPurple, width: 2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: Icon(Icons.email),
               ),
             ),
-            const SizedBox(height: 10.0),
-            TextField(
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _passwordController,
               obscureText: true,
-              onChanged: (value) {
-                password = value;
-              },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                labelText: 'Password',
                 hintText: 'Enter your password',
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
+                  borderSide:
+                      const BorderSide(color: Colors.deepPurple, width: 2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: Icon(Icons.lock),
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: loginUser,
+              // ignore: sort_child_properties_last
               child: const Text('Login'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.deepPurple,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
+                textStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(height: 10.0), // Add some space between the buttons
-            ElevatedButton(
-              onPressed: () {
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const ResetPasswordScreen()),
                 );
               },
-              child: const Text('Forgot Password?'),
+              child: const Text(
+                'Forgot Password?',
+                style: TextStyle(
+                    color: Colors.deepPurple,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
