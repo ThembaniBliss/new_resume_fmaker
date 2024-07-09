@@ -1,16 +1,20 @@
+// ignore_for_file: library_private_types_in_public_api
+
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:pdf/pdf.dart';
+//import 'package:printing/printing.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 class CreateCvScreen extends StatefulWidget {
   // ignore: use_super_parameters
   const CreateCvScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _CreateCvScreenState createState() => _CreateCvScreenState();
 }
 
@@ -44,7 +48,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
     }
   }
 
-  void saveCv() {
+  void saveCv() async {
     final Map<String, String> cvData = {
       'name': _nameController.text,
       'email': _emailController.text,
@@ -56,15 +60,16 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
       'certifications': _certificationsController.text,
     };
 
-    _firestore.collection('cvs').doc(loggedInUser?.uid).set(cvData).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('CV saved successfully.')),
-      );
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save CV: $error')),
-      );
-    });
+    await _firestore.collection('cvs').doc(loggedInUser?.uid).set(cvData);
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('CV saved successfully.')),
+    );
+
+    // Navigate to a new page after saving
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const SuccessPage()));
   }
 
   Future<void> generateAndSharePdf() async {
@@ -88,8 +93,19 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
       ),
     );
 
-    await Printing.sharePdf(
-        bytes: await pdf.save(), filename: '${_nameController.text} CV.pdf');
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/${_nameController.text} CV.pdf');
+    await file.writeAsBytes(await pdf.save());
+
+    final Email email = Email(
+      body: 'Here is my CV.',
+      subject: 'My CV',
+      recipients: [_emailController.text],
+      attachmentPaths: [file.path],
+      isHTML: false,
+    );
+
+    await FlutterEmailSender.send(email);
   }
 
   @override
@@ -125,6 +141,18 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
     return TextField(
       controller: controller,
       decoration: InputDecoration(hintText: hintText),
+    );
+  }
+}
+
+class SuccessPage extends StatelessWidget {
+  const SuccessPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Success')),
+      body: const Center(child: Text('You have successfully created your CV!')),
     );
   }
 }
