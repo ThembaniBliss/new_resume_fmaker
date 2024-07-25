@@ -1,10 +1,13 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "cSpell.words": [
+        "ARGB",
         "cupertino",
+        "dotenv",
         "googleapis",
         "resetpasswordscreen",
-        "resumefunctionality"
+        "resumefunctionality",
+        "webservice"
     ],
     "cmake.configureOnOpen": true,
     "cmake.sourceDirectory": "C:/new_resume_fmaker/test_typeahead/test_typeahead/linux"

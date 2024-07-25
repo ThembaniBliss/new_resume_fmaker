@@ -24,29 +24,27 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _raceController = TextEditingController();
   final TextEditingController _languagesController = TextEditingController();
-  final List<String> _skillsSuggestions = [
-    'Programming',
-    'Project Management',
-    'Communication'
-  ];
 
   Widget buildTextField(
-      String label, IconData icon, TextEditingController controller) {
+      String label, IconData icon, TextEditingController controller,
+      {int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
         controller: controller,
+        maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Colors.deepPurple),
+          prefixIcon: Icon(icon, color: const Color.fromARGB(255, 3, 209, 246)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: Colors.deepPurple),
+            borderSide: const BorderSide(color: Color.fromARGB(255, 9, 2, 142)),
           ),
           focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+            borderSide:
+                BorderSide(color: Color.fromARGB(255, 3, 151, 250), width: 2),
           ),
-          labelStyle: const TextStyle(color: Colors.deepPurple),
+          labelStyle: const TextStyle(color: Color.fromARGB(255, 2, 0, 78)),
         ),
       ),
     );
@@ -70,13 +68,11 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
                     style: pw.TextStyle(
                         fontSize: 24, fontWeight: pw.FontWeight.bold)),
               ),
-              pw.Text('Graphic Designer',
+              pw.Text(_profileController.text,
                   style: const pw.TextStyle(fontSize: 18)),
               pw.Divider(),
               pw.Header(level: 1, child: pw.Text('Contact Information')),
               pw.Text(_emailController.text),
-              pw.Text('123-456-7890'), // Placeholder
-              pw.Text('www.example.com'), // Placeholder
               pw.Header(level: 1, child: pw.Text('Personal Details')),
               pw.Bullet(text: 'Date of Birth: ${_dateOfBirthController.text}'),
               pw.Bullet(
@@ -87,8 +83,6 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
               pw.Bullet(text: 'Languages: ${_languagesController.text}'),
               pw.Header(level: 1, child: pw.Text('Education')),
               pw.Text(_educationController.text),
-              pw.Header(level: 1, child: pw.Text('Skills')),
-              ..._skillsSuggestions.map((skill) => pw.Bullet(text: skill)),
             ],
           );
         },
@@ -104,7 +98,7 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create CV'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color.fromARGB(255, 7, 44, 208),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -121,12 +115,14 @@ class _CreateCvScreenState extends State<CreateCvScreen> {
             buildTextField('Gender', Icons.transgender, _genderController),
             buildTextField('Race', Icons.run_circle, _raceController),
             buildTextField('Languages', Icons.language, _languagesController),
-            buildTextField('Education', Icons.school, _educationController),
+            buildTextField('Education', Icons.school, _educationController,
+                maxLines: 5),
             ElevatedButton(
               onPressed: generatePdf,
               child: const Text('Generate PDF'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple, // Background color
+                backgroundColor: const Color.fromARGB(
+                    255, 241, 238, 240), // Background color
               ),
             ),
           ],

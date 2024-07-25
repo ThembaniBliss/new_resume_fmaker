@@ -24,6 +24,9 @@ dependencies:
   googleapis_auth: ^1.6.0
   http: ^1.2.1
   googleapis: ^13.2.0
+  flutter_google_places: ^0.3.0
+  google_maps_webservice: ^0.0.20
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
